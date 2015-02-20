@@ -4,9 +4,13 @@
 ##  so that they can be retrieved, 
 ##  thus saving the time of repeated inversion.
 
-##   The timesaving can be great if the inverted matrix is used many times,
+## The timesaving can be great if the inverted matrix is used many times,
 ##       if the matrix is large and near singular, 
 ##       so that inversion takes a long time.
+
+## These functions calculate the inverse if it hasn't been done before
+##      and cache it. In future calls to cacheSolve the cahed inverse is
+##      retrieved, saving the time required for inversion.
 # ------------------------------------------------------------------------
 #  Layout of Rest of File
 #   1) Function makeCacheMatrix is documented and listed.
@@ -87,10 +91,14 @@ cacheSolve <- function(x, ...) {
 # [1,]   -2  1.5                [1,]    1    0
 # [2,]    1 -0.5                [2,]    0    1 
 
-#  ..... because the matrix product, x*z gives the identiy matrix, 
-#  where * is used to denote matrix multiplication, and
-#        an identity matrix is a square matix with 1 on the main diagonal
-#             and zeroes everywhere else.
+#  ..... because the matrix product, x*z gives the identity matrix, 
+#  where: - * is used to denote matrix multiplication, 
+#         - in the matrix product of n by n matrices, x*Z = p, 
+#              p is also an n by n matrix with elements p.ij in row i, column j 
+#                   for i,j in the range [1,n],
+#              and p.ij = x.i1*z.1j + x.i2*z.2j + .... + x.in*z.nj, and
+#         - an identity matrix is a square matrix with 1's on the main diagonal
+#              and zeroes everywhere else - see above for 2 by 2 identity matrix.
 
 #  Reference:   http://mathworld.wolfram.com/MatrixInverse.html
 #     (The inverse of a square matrix A is a matrix A.inv 
@@ -101,7 +109,7 @@ cacheSolve <- function(x, ...) {
 #         [ii] running cacheSolve twice, 
 #   proving that
 #   i) the first run of cacheSolve causes the inverse to be calculated,
-#  ii) the second run retrieves the inverse from the cache, and
+#  ii) the second (and subsequent) runs retrieve the inverse from the cache, and
 # iii) xxx, the inverse produced, is the same as the output of 
 #          function solve, z (given above).
 
@@ -134,11 +142,14 @@ cacheSolve <- function(x, ...) {
 #          # [ii]  cacheSolve is run twice & xxx is printed
 # > xxx <- cacheSolve(xx)   # i)   first run calculates the inverse
 # calculating inverse       
-# > xxx <- cacheSolve(xx)   # ii)  second run retrieves inverse from cache
+# > xxx <- cacheSolve(xx)   # ii)  second run retrieves inverse from cache  ****
 # getting cached inverse
-# > xxx                     # iii) inverse xxx is the same as z,   
+# > xxx                     # iii) cached inverse xxx is the same as z,   
 #       [,1] [,2]           #      produced by solve above.
 # [1,]   -2  1.5
-# [2,]    1 -0.5     
+# [2,]    1 -0.5  
+
+# **** subsequent xxx <- cacheSolve(xx) calls will also retrieve the cache inverse.
+
 # ----------- End of proof that programme works ---------------------------
 # ----------- End of file. ------------------------------------------------
