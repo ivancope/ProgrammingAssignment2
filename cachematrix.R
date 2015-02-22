@@ -1,32 +1,36 @@
-# ------------------- Start of file. -----------------------------------
-## Overall description of functions.
+# ----------------  Overall description of functions ------------------------
+
 ##  The objective is to save time by caching inverted matrices 
 ##  so that they can be retrieved, 
 ##  thus saving the time of repeated inversion.
 
-## The timesaving can be great if the inverted matrix is used many times,
-##       if the matrix is large and near singular, 
+## The timesaving can be great if the inverted matrix is used many times -
+##       especially if the matrix is large and near singular, 
 ##       so that inversion takes a long time.
 
 ## These functions calculate the inverse if it hasn't been done before
-##      and cache it. In future calls to cacheSolve the cahed inverse is
-##      retrieved, saving the time required for inversion.
-# ------------------------------------------------------------------------
-#  Layout of Rest of File
+##      and cache it. 
+##      In future calls to cacheSolve, using the list output of makeCacheMatrix,
+##      the cached inverse is retrieved, saving the time required for inversion.
+
+# ---------------- Layout of Rest of File -----------------------------------
+  
 #   1) Function makeCacheMatrix is documented and listed.
 #   2) Function cacheSolve is documented and listed.
-#   3) using a 2*2 square test matrix it is shown that 
+#   3) Using a 2*2 square test matrix it is shown that 
 #        function solve inverts the test matrix correctly
 #        the first run of cacheSolve causes the inverse to be calculated,
 #        the second run retrieves the inverse from the cache, and
 #        xxx, the inverse produced, is the same as the output of 
 #          function solve, z (given above).
+#      This proves that the programme works and the objective has been met.
+#   4) Issues with the current version are discussed.
 
-#   This proves that the programme works and the objective has been met.
-#   [ The proof was not requested, but it is felt to be essential.
-#     When presenting work to a client this shows 
-#     evidence of good workmanship.]
-# -------------------------------------------------------------------------
+#   [ The proof and discussion of issues was not requested, 
+#     but it is felt to be essential When presenting work to a client.
+#     It shows evidence of good workmanship.]
+#
+# ---------------- 1) Function makeCacheMatrix -------------------------------
 ## 1)  Function makeCacheMatrix creates a "special" matrix,
 ##      which is really a list containing a function to
 ##           set the value of the matrix
@@ -48,7 +52,7 @@ makeCacheMatrix <- function(x = matrix()) {
        getsolve = getsolve)
 }
 
-# ------------------------------------------------------------------------
+# ------------- 2) Function cacheSolve ---------------------------------------
 ## 2)  Function cacheSolve returns a matrix that is the inverse 
 ##       of the matrix used in the makeCacheMatrix function call.
 
@@ -74,7 +78,7 @@ cacheSolve <- function(x, ...) {
   m
 }
 
-# ------------------------------------------------------------------
+# ----------- 3) Proof that Programme Works Correctly -----------------------
 #  Proof that the programme works. 
 #  This is mainly a reproduction of the R output.
 
@@ -87,13 +91,13 @@ cacheSolve <- function(x, ...) {
 
 # > z <- solve(x)   # showing that function solve works .....
 # > z
-#      [,1] [,2]           x*z =      [,1] [,2] 
-# [1,]   -2  1.5                [1,]    1    0
-# [2,]    1 -0.5                [2,]    0    1 
+#      [,1] [,2]           x %*% z =      [,1] [,2] 
+# [1,]   -2  1.5                   [1,]    1    0
+# [2,]    1 -0.5                   [2,]    0    1 
 
-#  ..... because the matrix product, x*z gives the identity matrix, 
-#  where: - * is used to denote matrix multiplication, 
-#         - in the matrix product of n by n matrices, x*Z = p, 
+#  ..... because the matrix product, x %*% z gives the identity matrix, 
+#  where: - %*% is used to denote matrix multiplication, 
+#         - in the matrix product of n by n matrices, x %*% z = p, 
 #              p is also an n by n matrix with elements p.ij in row i, column j 
 #                   for i,j in the range [1,n],
 #              and p.ij = x.i1*z.1j + x.i2*z.2j + .... + x.in*z.nj, and
@@ -151,5 +155,19 @@ cacheSolve <- function(x, ...) {
 
 # **** subsequent xxx <- cacheSolve(xx) calls will also retrieve the cache inverse.
 
-# ----------- End of proof that programme works ---------------------------
+# ----------- 4) Current Issues ---------------------------------------------------
+##
+## 1)There is no test for nonsingularity (invertability) 
+##         on the matrix to be inverted.
+## 2) There is no test to see that the cached matrix is correct. 
+## 3) The system is not transparent to the user.
+##         After the call to makeCacheMatrix using matrix x,
+##         the output list xx must be used as input to cacheSolve
+##         both initially and in future calls requiring the inverse.
+##    It would be better to have a call handler 
+##    that directs computation seamlessly.
+##
+##    [Hopefully this type of thing will be addressed in future courses
+##         of the series.]
+##
 # ----------- End of file. ------------------------------------------------
