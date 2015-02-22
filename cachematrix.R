@@ -8,9 +8,9 @@
 ##       especially if the matrix is large and near singular, 
 ##       so that inversion takes a long time.
 
-## These functions calculate the inverse if it hasn't been done before
-##      and cache it. 
-##      In future calls to cacheSolve, using the list output of makeCacheMatrix,
+## These functions calculate the inverse (if it hasn't been done before)
+##      and cache the calculated inverse.
+## In future calls to cacheSolve, using the list output of makeCacheMatrix,
 ##      the cached inverse is retrieved, saving the time required for inversion.
 
 # ---------------- Layout of Rest of File -----------------------------------
@@ -20,15 +20,15 @@
 #   3) Using a 2*2 square test matrix it is shown that 
 #        function solve inverts the test matrix correctly
 #        the first run of cacheSolve causes the inverse to be calculated,
-#        the second run retrieves the inverse from the cache, and
+#        the second (and subsequent) run retrieves the inverse from the cache, and
 #        xxx, the inverse produced, is the same as the output of 
-#          function solve, z (given above).
+#          function solve.
 #      This proves that the programme works and the objective has been met.
 #   4) Issues with the current version are discussed.
 
 #   [ The proof and discussion of issues was not requested, 
-#     but it is felt to be essential When presenting work to a client.
-#     It shows evidence of good workmanship.]
+#     but it is felt to be essential when presenting work to a client -
+#     it demonstrates good workmanship.]
 #
 # ---------------- 1) Function makeCacheMatrix -------------------------------
 ## 1)  Function makeCacheMatrix creates a "special" matrix,
@@ -39,17 +39,17 @@
 ##           get the value of the inverse
 
 makeCacheMatrix <- function(x = matrix()) {
-  m <- NULL
-  set <- function(y) {
-    x <<- y
-    m <<- NULL
-  }
-  get <- function() x
-  setsolve <- function(solve) m <<- solve
-  getsolve <- function() m
-  list(set = set, get = get,
-       setsolve = setsolve,
-       getsolve = getsolve)
+    m <- NULL
+    set <- function(y) {
+        x <<- y
+        m <<- NULL
+    }
+    get <- function() x
+    setsolve <- function(solve) m <<- solve
+    getsolve <- function() m
+    list(set = set, get = get,
+        setsolve = setsolve,
+        getsolve = getsolve)
 }
 
 # ------------- 2) Function cacheSolve ---------------------------------------
@@ -66,16 +66,16 @@ cacheSolve <- function(x, ...) {
   ## Function cacheSolve returns a matrix that is the inverse
   ##  of the matrix input to function makeCacheMatrix.
   
-  m <- x$getsolve()
-  if(!is.null(m)) {
-       message("getting cached inverse")
-       return(m)
-  }
-  data <- x$get()
-  message("calculating inverse")
-  m <- solve(data, ...)
-  x$setsolve(m)
-  m
+    m <- x$getsolve()
+    if(!is.null(m)) {
+        message("Getting cached inverse.")
+        return(m)
+    }
+    data <- x$get()
+    message("Calculating inverse.")
+    m <- solve(data, ...)
+    x$setsolve(m)
+    m
 }
 
 # ----------- 3) Proof that Programme Works Correctly -----------------------
@@ -106,7 +106,7 @@ cacheSolve <- function(x, ...) {
 
 #  Reference:   http://mathworld.wolfram.com/MatrixInverse.html
 #     (The inverse of a square matrix A is a matrix A.inv 
-#     such that  A*A.inv = I, where I is the identity matrix.)
+#     such that  A %*% A.inv = I, where I is the identity matrix.)
      
 #   2) We now present the output of 
 #          [i] running makeCacheMatrix once, followed by
@@ -145,19 +145,19 @@ cacheSolve <- function(x, ...) {
 
 #          # [ii]  cacheSolve is run twice & xxx is printed
 # > xxx <- cacheSolve(xx)   # i)   first run calculates the inverse
-# calculating inverse       
-# > xxx <- cacheSolve(xx)   # ii)  second run retrieves inverse from cache  ****
-# getting cached inverse
+# Calculating inverse.      #     This  message shows that inverse was calculated.
+# > xxx <- cacheSolve(xx)   # ii)  second run retrieves inverse from cache  [*1*!
+# Getting cached inverse.   #     This  message shows that inverse was retrieved.
 # > xxx                     # iii) cached inverse xxx is the same as z,   
 #       [,1] [,2]           #      produced by solve above.
 # [1,]   -2  1.5
 # [2,]    1 -0.5  
 
-# **** subsequent xxx <- cacheSolve(xx) calls will also retrieve the cache inverse.
+# [*1*! subsequent xxx <- cacheSolve(xx) calls will also retrieve the cache inverse.
 
 # ----------- 4) Current Issues ---------------------------------------------------
 ##
-## 1)There is no test for nonsingularity (invertability) 
+## 1) There is no test for nonsingularity (invertability) 
 ##         on the matrix to be inverted.
 ## 2) There is no test to see that the cached matrix is correct. 
 ## 3) The system is not transparent to the user.
@@ -169,5 +169,5 @@ cacheSolve <- function(x, ...) {
 ##
 ##    [Hopefully this type of thing will be addressed in future courses
 ##         of the series.]
-##
+#
 # ----------- End of file. ------------------------------------------------
